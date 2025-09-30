@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIPMP - Interactive Placement Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style id="main-styles">
+        /* --- CSS Reset & General Styling --- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary-color: #00bfa5;
+            --secondary-color: #448aff;
+            --danger-color: #f44336;
+            --dark-bg: #121212;
+            --mid-dark-bg: #1e1e1e;
+            --text-light: #f5f5f5;
+            --text-mid: #bdbdbd;
+            --card-bg: #2a2a2a;
+            --border-color: #424242;
+            --box-shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --transition-speed: 0.4s ease;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; line-height: 1.7; color: var(--text-light); background-color: var(--dark-bg); overflow-x: hidden; }
+        .container { max-width: 1200px; margin: auto; padding: 0 2rem; }
+        h1, h2, h3 { color: var(--text-light); text-align: center; margin-bottom: 1.5rem; font-weight: 700; }
+        h1 { font-size: 3.8rem; } h2 { font-size: 2.8rem; } h3 { font-size: 1.8rem; }
+        section { padding: 8rem 0; position: relative; overflow: hidden; }
+        .text-center { text-align: center; }
+
+        /* --- Buttons --- */
+        .btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.8rem 2rem; border: none; border-radius: 50px; cursor: pointer; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all var(--transition-speed); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        .btn-primary { background-color: var(--primary-color); color: var(--dark-bg); }
+        .btn-primary:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 8px 25px rgba(0, 191, 165, 0.4); }
+        .btn-secondary { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); }
+        .btn-secondary:hover { background-color: var(--primary-color); color: var(--dark-bg); transform: translateY(-5px) scale(1.05); }
+
+        /* --- Navigation --- */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 3rem; background: rgba(18, 18, 18, 0.8); box-shadow: var(--box-shadow-dark); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+        .navbar .logo { font-size: 2rem; font-weight: 700; color: var(--primary-color); }
+        .navbar-links { display: flex; align-items: center; gap: 1rem; }
+        .navbar-links ul { display: flex; list-style: none; }
+        .navbar-links ul li a { display: flex; align-items: center; gap: 0.5rem; padding: 0 1rem; text-decoration: none; color: var(--text-light); font-weight: 500; border-radius: 20px; transition: all var(--transition-speed); }
+        .navbar-links ul li a:hover { color: var(--primary-color); background-color: var(--card-bg); }
+        #logout-button { display: none; background-color: var(--danger-color); color: var(--text-light); }
+
+        /* --- Hero Section --- */
+        .hero { height: 95vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; background: linear-gradient(rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0.9)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1484') no-repeat center center/cover; }
+        
+        /* --- Cards --- */
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; margin-top: 3rem; }
+        .card { background: var(--card-bg); padding: 2.5rem; border-radius: 15px; box-shadow: var(--box-shadow-dark); border-left: 5px solid var(--primary-color); transition: transform var(--transition-speed), box-shadow var(--transition-speed); }
+        .card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7); }
+        .card .icon { font-size: 4rem; margin-bottom: 1.5rem; color: var(--primary-color); display: block; line-height: 1; }
+        .card-link { text-decoration: none; color: inherit; display: block; border-radius: 15px; } /* Wraps the card */
+        
+        /* --- Features Section --- */
+        .feature-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 1.5rem; }
+        .feature-link { background: var(--card-bg); color: var(--text-mid); border: 1px solid var(--border-color); }
+        .feature-link:hover { background-color: var(--primary-color); color: var(--dark-bg); transform: translateY(-5px) scale(1.05); }
+
+        /* --- Modals --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity var(--transition-speed), visibility var(--transition-speed); }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { position: relative; background: var(--card-bg); padding: 2.5rem; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: var(--box-shadow-dark); border-top: 5px solid var(--primary-color); transform: translateY(-20px); transition: transform var(--transition-speed); }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: var(--text-mid); cursor: pointer; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-mid); }
+        .form-group input { width: 100%; padding: 0.8rem; background: var(--mid-dark-bg); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-light); font-size: 1rem; }
+        .error-message { color: var(--danger-color); text-align: center; margin-top: 1rem; display: none; }
+
+        /* --- Chatbot --- */
+        .chatbot-fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--dark-bg); cursor: pointer; box-shadow: 0 5px 20px rgba(0, 191, 165, 0.4); z-index: 998; transition: transform var(--transition-speed); }
+        .chatbot-fab:hover { transform: scale(1.1); }
+        .chatbot-window { position: fixed; bottom: 100px; right: 30px; width: 90%; max-width: 370px; height: 500px; background: var(--mid-dark-bg); border-radius: 15px; box-shadow: var(--box-shadow-dark); z-index: 999; display: flex; flex-direction: column; overflow: hidden; opacity: 0; transform: translateY(20px); transition: opacity var(--transition-speed), transform var(--transition-speed); pointer-events: none; }
+        .chatbot-window.active { opacity: 1; transform: translateY(0); pointer-events: all; }
+        .chatbot-header { background: var(--card-bg); padding: 1rem; text-align: center; font-weight: 600; position: relative; }
+        .chatbot-header .close-chatbot { position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; }
+        .chat-messages { flex-grow: 1; padding: 1rem; overflow-y: auto; }
+        .chat-message { max-width: 80%; padding: 0.75rem 1rem; border-radius: 10px; line-height: 1.4; margin-bottom: 0.75rem; }
+        .chat-message.bot { background: var(--card-bg); align-self: flex-start; border-bottom-left-radius: 0; }
+        .chat-message.user { background: var(--primary-color); color: var(--dark-bg); align-self: flex-end; border-bottom-right-radius: 0; }
+        #chatbot-form { display: flex; padding: 1rem; border-top: 1px solid var(--border-color); }
+        #chatbot-input { flex-grow: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-light); padding: 0.75rem; border-radius: 20px; }
+        #chatbot-form button { background: none; border: none; color: var(--primary-color); font-size: 1.5rem; cursor: pointer; padding: 0 0.5rem 0 1rem; }
+        
+        /* --- Footer --- */
+        .footer { background-color: #0c0c0c; color: var(--text-mid); padding: 4rem 2rem; text-align: center; border-top: 1px solid var(--border-color); }
+        .footer .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: left; }
+        .footer h4 { color: var(--text-light); margin-bottom: 1.5rem; font-size: 1.3rem; }
+        .footer a, .footer p { color: var(--text-mid); text-decoration: none; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.8rem; transition: color var(--transition-speed); }
+        .footer a:hover { color: var(--primary-color); }
+        
+        /* --- Detail Page Styles --- */
+        .detail-body { background-color: var(--dark-bg); }
+        .detail-header { background-color: var(--mid-dark-bg); padding: 3rem; text-align: center; }
+        .detail-content { max-width: 1100px; margin: 4rem auto; padding: 0 2rem; display: grid; grid-template-columns: 4fr 5fr; gap: 4rem; align-items: center; }
+        .detail-content img { width: 100%; border-radius: 15px; }
+        .detail-content ul { list-style: none; padding: 0; }
+        .detail-content li { background: var(--card-bg); margin-bottom: 1.5rem; padding: 1.5rem; border-radius: 10px; }
+        .detail-content li strong { color: var(--primary-color); }
+
+        /* --- CLICK ANIMATIONS --- */
+        .btn:active,
+        .navbar-links ul li a:active,
+        .chatbot-fab:active {
+            transform: scale(0.95);
+            filter: brightness(0.9);
+            transition: transform 0.1s ease, filter 0.1s ease;
+        }
+        .card-link:active .card {
+            transform: translateY(-5px) scale(0.98);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            filter: brightness(0.9);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) { .detail-content { grid-template-columns: 1fr; } .navbar { flex-direction: column; padding: 1rem; } .navbar-links ul { margin-top: 1rem; } }
+        @media (max-width: 768px) { .hero h1 { font-size: 2.5rem; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">CIPMP</div>
+            <div class="navbar-links">
+                <ul>
+                    <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#features"><i class="fas fa-star"></i> Features</a></li>
+                    <li><a href="#innovation"><i class="fas fa-lightbulb"></i> Innovation</a></li>
+                </ul>
+                <a href="#" class="btn btn-secondary open-login-modal" id="login-button">Login</a>
+                <a href="#" class="btn" id="logout-button" style="background-color: var(--danger-color); color: var(--text-light);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content" data-aos="fade-in" data-aos-duration="1500">
+                <h1>Connecting Talent with Opportunity, Seamlessly.</h1>
+                <p>The all-in-one platform for modern institutions. Centralize opportunities, automate workflows, and empower your students for success.</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary open-demo-modal" data-aos="fade-up" data-aos-delay="200"><i class="fas fa-calendar-alt"></i> Schedule a Demo</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="container">
+            <h2 data-aos="fade-up">A Tailored Experience for Everyone</h2>
+            <p class="text-center" data-aos="fade-up" data-aos-delay="100">Click on any role to open a new tab with more detailed information.</p>
+            <div class="feature-links" data-aos="fade-up" data-aos-delay="200">
+                <a href="#" id="student-link" class="btn feature-link"><i class="fas fa-user-graduate"></i> Student Portal</a>
+                <a href="#" id="cell-link" class="btn feature-link"><i class="fas fa-building"></i> Placement Cell</a>
+                <a href="#" id="mentor-link" class="btn feature-link"><i class="fas fa-chalkboard-teacher"></i> Mentor Portal</a>
+                <a href="#" id="industry-link" class="btn feature-link"><i class="fas fa-industry"></i> Industry Portal</a>
+            </div>
+        </section>
+
+        <section id="innovation" class="container">
+            <h2 data-aos="fade-up">Built with Innovation at its Core</h2>
+             <div class="grid-3">
+                <a href="#" id="ai-link" class="card-link" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="card"><i class="fas fa-robot icon"></i><h3>AI-Powered Matching</h3><p>Our engine matches students to best-fit opportunities.</p></div>
+                </a>
+                <a href="#" id="privacy-link" class="card-link" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="card"><i class="fas fa-lock icon"></i><h3>Role-Based Privacy</h3><p>Employers view only relevant, approved student data.</p></div>
+                </a>
+                <a href="#" id="certification-link" class="card-link" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="card"><i class="fas fa-award icon"></i><h3>Automated Certification</h3><p>The system auto-generates digital certificates.</p></div>
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <div id="demo-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="demo-form-container">
+                <h3>Schedule a Demo</h3>
+                <form id="demo-form">
+                    <div class="form-group"><label for="name">Full Name</label><input type="text" id="name" name="name" required></div>
+                    <div class="form-group"><label for="email">Work Email</label><input type="email" id="email" name="email" required></div>
+                    <div class="form-group"><label for="institution">Institution Name</label><input type="text" id="institution" name="institution" required></div>
+                    <div class="form-group"><label for="date">Preferred Date</label><input type="date" id="date" name="date" required></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Request Demo</button>
+                </form>
+            </div>
+            <div id="demo-confirmation" style="display: none;"><h3><i class="fas fa-check-circle"></i> Thank You!</h3><p>Your demo request has been received.</p></div>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Portal Login</h3>
+            <form id="login-form">
+                <div class="form-group"><label for="username">Username</label><input type="text" id="username" required></div>
+                <div class="form-group"><label for="password">Password</label><input type="password" id="password" required></div>
+                <p class="error-message" id="login-error">Invalid credentials. Try `admin` and `password`.</p>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="chatbot-fab" id="chatbot-fab"><i class="fas fa-comments"></i></div>
+    <div class="chatbot-window" id="chatbot-window">
+        <div class="chatbot-header">AI Assistant <span class="close-chatbot" id="close-chatbot">&times;</span></div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <form id="chatbot-form" class="chatbot-form">
+            <input type="text" id="chatbot-input" placeholder="Ask something..." autocomplete="off">
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </div>
+
+    <script type="text/template" id="student-details-template"><header class="detail-header"><h1><i class="fas fa-user-graduate"></i> Student Portal</h1></header><main class="detail-content"><div class="feature-image"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1471" alt="Students collaborating"></div><div class="feature-list"><ul><li><strong>Unified Digital Profile:</strong> Create a single, dynamic resume with skills, projects, and verified academic records.</li><li><strong>AI-Powered Recommendations:</strong> Our smart engine suggests the most suitable opportunities for you.</li></ul></div></main></script>
+    <script type="text/template" id="cell-details-template"><header class="detail-header"><h1><i class="fas fa-building"></i> Placement Cell Portal</h1></header><main class="detail-content"><div class="feature-image"><img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1470" alt="Team analyzing data"></div><div class="feature-list"><ul><li><strong>Centralized Opportunity Hub:</strong> Post, verify, and manage all internships and job openings from one place.</li><li><strong>Real-Time Management Dashboard:</strong> Get a 360-degree view of all ongoing processes.</li></ul></div></main></script>
+    <script type="text/template" id="mentor-details-template"><header class="detail-header"><h1><i class="fas fa-chalkboard-teacher"></i> Mentor Portal</h1></header><main class="detail-content"><div class="feature-image"><img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=1470" alt="A mentor guiding a student"></div><div class="feature-list"><ul><li><strong>Automated Approval Workflow:</strong> Receive and approve student applications through automated notifications.</li><li><strong>Student Progress Monitoring:</strong> Access a dashboard to easily track the progress of your mentees.</li></ul></div></main></script>
+    <script type="text/template" id="industry-details-template"><header class="detail-header"><h1><i class="fas fa-industry"></i> Industry Partner Portal</h1></header><main class="detail-content"><div class="feature-image"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1528" alt="Business analytics"></div><div class="feature-list"><ul><li><strong>Effortless Opportunity Posting:</strong> Quickly post your internship or job requirements to a targeted audience.</li><li><strong>Advanced Candidate Filtering:</strong> Shortlist candidates efficiently using filters for skills and academic performance.</li></ul></div></main></script>
+    <script type="text/template" id="ai-details-template"><header class="detail-header"><h1><i class="fas fa-robot"></i> AI-Powered Matching Engine</h1></header><main class="detail-content"><div class="feature-image"><img src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?q=80&w=1587" alt="Abstract network lines graphic"></div><div class="feature-list"><h3>How It Works</h3><p>Our engine uses machine learning to analyze student profiles and match them against competency requirements posted by companies.</p><ul><li><strong>Benefit for Students:</strong> Discover relevant opportunities you might have otherwise missed.</li><li><strong>Benefit for Placement Cell:</strong> Increase your placement success rate by presenting companies with highly qualified candidates.</li></ul></div></main></script>
+    <script type="text/template" id="privacy-details-template"><header class="detail-header"><h1><i class="fas fa-lock"></i> Role-Based Privacy & Security</h1></header><main class="detail-content"><div class="feature-image"><img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1470" alt="Secure data server room"></div><div class="feature-list"><h3>Our Commitment to Security</h3><p>Our platform is built on a secure framework with strict Role-Based Access Control (RBAC). Data is only seen by authorized individuals.</p><ul><li><strong>Student Data Protection:</strong> Companies can only view your profile after you apply for an opportunity.</li><li><strong>Compliance Assured:</strong> This architecture ensures compliance with data protection regulations.</li></ul></div></main></script>
+    <script type="text/template" id="certification-details-template"><header class="detail-header"><h1><i class="fas fa-award"></i> Automated Digital Certification</h1></header><main class="detail-content"><div class="feature-image"><img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=1470" alt="Digital certificate on a screen"></div><div class="feature-list"><h3>Seamless and Secure</h3><p>Once an industry partner marks an internship as complete, our system automatically generates a secure, digitally signed certificate for the student.</p><ul><li><strong>Instant Gratification:</strong> Students receive their certificate the moment their internship is approved.</li><li><strong>Verifiable Credentials:</strong> Each certificate can be verified, preventing fraud.</li></ul></div></main></script>
+
+    <footer class="footer">
+        <div class="container">
+            <div><h4>CIPMP</h4><p>© 2025 CIPMP</p></div>
+            <div><h4>Navigation</h4><a href="#home">Home</a><a href="#features">Features</a></div>
+            <div><h4>Developer Details</h4><p><i class="fas fa-user"></i> Chiragvendra.S</p><a href="mailto:chiragsrinivas2004@gmail.com"><i class="fas fa-envelope"></i> chiragsrinivas2004@gmail.com</a></div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        // --- Detail Page Link Logic ---
+        function openDetailPage(pageTitle, templateId) {
+            const styles = document.getElementById('main-styles').innerHTML;
+            const content = document.getElementById(templateId).innerHTML;
+            const newTab = window.open('', '_blank');
+            newTab.document.write(`
+                <!DOCTYPE html><html lang="en"><head>
+                    <title>${pageTitle} | CIPMP</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+                    <style>${styles}</style>
+                </head><body class="detail-body">${content}</body></html>
+            `);
+            newTab.document.close();
+        }
+
+        const detailLinks = [
+            { id: 'student-link', title: 'Student Portal', template: 'student-details-template' },
+            { id: 'cell-link', title: 'Placement Cell', template: 'cell-details-template' },
+            { id: 'mentor-link', title: 'Mentor Portal', template: 'mentor-details-template' },
+            { id: 'industry-link', title: 'Industry Portal', template: 'industry-details-template' },
+            { id: 'ai-link', title: 'AI Matching', template: 'ai-details-template' },
+            { id: 'privacy-link', title: 'Privacy & Security', template: 'privacy-details-template' },
+            { id: 'certification-link', title: 'Automated Certification', template: 'certification-details-template' }
+        ];
+
+        detailLinks.forEach(link => {
+            const element = document.getElementById(link.id);
+            if (element) {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openDetailPage(link.title, link.template);
+                });
+            }
+        });
+
+        // --- Shared Modal Logic ---
+        const openDemoModalBtn = document.querySelector('.open-demo-modal');
+        const openLoginModalBtn = document.querySelector('.open-login-modal');
+        const closeModalButtons = document.querySelectorAll('.modal-close');
+        const demoModal = document.getElementById('demo-modal');
+        const loginModal = document.getElementById('login-modal');
+
+        const closeModal = (modal) => modal.classList.remove('active');
+
+        openDemoModalBtn.addEventListener('click', (e) => { e.preventDefault(); demoModal.classList.add('active'); });
+        openLoginModalBtn.addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.add('active'); });
+        
+        closeModalButtons.forEach(button => button.addEventListener('click', () => closeModal(button.closest('.modal-overlay'))));
+        document.querySelectorAll('.modal-overlay').forEach(overlay => overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(overlay); }));
+
+        // --- Login Logic ---
+        const loginForm = document.getElementById('login-form');
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const loginError = document.getElementById('login-error');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (loginForm.username.value === 'admin' && loginForm.password.value === 'password') {
+                loginButton.style.display = 'none';
+                logoutButton.style.display = 'inline-flex';
+                closeModal(loginModal);
+                loginError.style.display = 'none';
+                loginForm.reset();
+            } else {
+                loginError.style.display = 'block';
+            }
+        });
+        logoutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutButton.style.display = 'none';
+            loginButton.style.display = 'inline-flex';
+        });
+
+        // --- Demo Form Logic ---
+        const demoForm = document.getElementById('demo-form');
+        const demoFormContainer = document.getElementById('demo-form-container');
+        const demoConfirmation = document.getElementById('demo-confirmation');
+
+        demoForm.addEventListener('submit', e => {
+            e.preventDefault();
+            demoFormContainer.style.display = 'none';
+            demoConfirmation.style.display = 'block';
+        });
+
+        // --- Chatbot Logic ---
+        const chatbotFab = document.getElementById('chatbot-fab');
+        const chatbotWindow = document.getElementById('chatbot-window');
+        const closeChatbot = document.getElementById('close-chatbot');
+        const chatbotForm = document.getElementById('chatbot-form');
+        const chatbotInput = document.getElementById('chatbot-input');
+        const chatMessages = document.getElementById('chat-messages');
+
+        const toggleChatbot = () => chatbotWindow.classList.toggle('active');
+        chatbotFab.addEventListener('click', toggleChatbot);
+        closeChatbot.addEventListener('click', toggleChatbot);
+
+        const addMessage = (text, sender) => {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', sender);
+            messageElement.textContent = text;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        const getBotResponse = (userInput) => {
+            const input = userInput.toLowerCase();
+            if (input.includes('feature')) return "Our portal includes modules for Students, Placement Cells, Mentors, and Industry Partners, with AI-matching and automated certifications.";
+            if (input.includes('pricing') || input.includes('cost')) return "Our platform is budget-friendly. For a detailed quote, please schedule a demo!";
+            if (input.includes('demo')) return "You can schedule a demo by clicking the 'Schedule a Demo' button on the main page.";
+            if (input.includes('support') || input.includes('help')) return "You can reach our developer at chiragsrinivas2004@gmail.com for any assistance.";
+            return "Sorry, I don't understand that. You can ask about features, pricing, or how to schedule a demo.";
+        };
+
+        chatbotForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userInput = chatbotInput.value.trim();
+            if (!userInput) return;
+            addMessage(userInput, 'user');
+            chatbotInput.value = '';
+            setTimeout(() => {
+                const botResponse = getBotResponse(userInput);
+                addMessage(botResponse, 'bot');
+            }, 1000);
+        });
+        addMessage("Hello! I'm the CIPMP assistant. How can I help you today?", 'bot');
+    </script>
+</body>
+</html>
